@@ -1,40 +1,30 @@
-import { Box, Grid, HStack, Image, Text, VStack } from "@chakra-ui/react";
-import { FaStar } from "react-icons/fa";
+import { Box, Grid, Skeleton, SkeletonText } from "@chakra-ui/react";
+import Room from "../components/Room";
 
 export default function Home() {
   return (
     <Grid
       mt={10}
-      px={35}
+      px={{
+        base: 10,
+        lg: 20,
+      }}
       columnGap={4}
-      rowGap={8}
-      templateColumns={"repeat(5, 1fr)"}
+      rowGap={12}
+      templateColumns={{
+        sm: "1fr",
+        md: "1fr 1fr",
+        lg: "repeat(3, 1fr)",
+        xl: "repeat(4, 1fr)",
+        "2xl": "repeat(5, 1fr)",
+      }}
     >
-      <VStack alignItems={"fles-start"} spacing={-0.5}>
-        <Box overflow={"hidden"} mb={2} rounded={"3xl"}>
-          <Image
-            h={"280"}
-            src='https://a0.muscache.com/im/pictures/32e8b4a0-83ff-4dba-8253-5340d8d05215.jpg?im_w=720'
-          />
-        </Box>
-        <Box>
-          <Grid gap={2} templateColumns={"6fr 1fr"}>
-            <Text as='b' noOfLines={1} fontSize='md'>
-              Hwachon-myeon, Hongcheon, Gangwon Province, South Korea
-            </Text>
-            <HStack spacing={1}>
-              <FaStar size={15} />
-              <Text>5.0</Text>
-            </HStack>
-          </Grid>
-          <Text fontSize={"sm"} color='gray.600'>
-            Seoul, S.Korea
-          </Text>
-        </Box>
-        <Text fontSize={"sm"} color='gray.600'>
-          <Text as='b'>$72</Text> / night
-        </Text>
-      </VStack>
+      <Room />
+      <Box>
+        <Skeleton rounded='2xl' mb={7} height={280} />
+        <SkeletonText w='50%' noOfLines={2} mb={7} />
+        <SkeletonText w='20%' noOfLines={1} />
+      </Box>
     </Grid>
   );
 }
