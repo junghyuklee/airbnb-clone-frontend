@@ -46,3 +46,45 @@ export const githubLogIn = (code: string) =>
       },
     )
     .then((response) => response.status);
+
+export const kakaoLogIn = (code: string) =>
+  instance
+    .post(
+      `users/kakao`,
+      { code },
+      {
+        headers: {
+          "X-CSRFToken": Cookie.get("csrftoken") || "",
+        },
+      },
+    )
+    .then((response) => response.status);
+
+export interface IUserDefaultLoginVariables {
+  username: string;
+  password: string;
+}
+
+export interface IUserDefaultLoginSuccess {
+  ok: string;
+}
+
+export interface IUserDefaultLoginError {
+  error: string;
+}
+
+export const userDefualtLogin = ({
+  username,
+  password,
+}: IUserDefaultLoginVariables) =>
+  instance
+    .post(
+      `users/log-in`,
+      { username, password },
+      {
+        headers: {
+          "X-CSRFToken": Cookie.get("csrftoken") || "",
+        },
+      },
+    )
+    .then((response) => response.data);
