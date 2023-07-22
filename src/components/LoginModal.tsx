@@ -11,6 +11,7 @@ import {
   ModalContent,
   ModalHeader,
   ModalOverlay,
+  Text,
   VStack,
   useToast,
 } from "@chakra-ui/react";
@@ -28,7 +29,6 @@ interface LoginModalProps {
   isOpen: boolean;
   onClose: () => void;
 }
-
 interface ILoginForm {
   username: string;
   password: string;
@@ -39,17 +39,15 @@ export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
     register,
     handleSubmit,
     formState: { errors },
+    reset,
   } = useForm<ILoginForm>();
   const toast = useToast();
   const queryClient = useQueryClient();
-  const mutation = useMutation<
+  const loginMutation = useMutation<
     IUserDefaultLoginSuccess,
     IUserDefaultLoginError,
     IUserDefaultLoginVariables
   >(userDefualtLogin, {
-    onMutate: () => {
-      console.log("mutation starting");
-    },
     onSuccess: (data) => {
       toast({
         title: "welcome back!",
@@ -58,13 +56,14 @@ export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
       });
       onClose();
       queryClient.refetchQueries(["me"]);
+      reset();
     },
     onError: (error) => {
       console.log("mutation has an error");
     },
   });
   const onSubmit = ({ username, password }: ILoginForm) => {
-    mutation.mutate({ username, password });
+    loginMutation.mutate({ username, password });
   };
   return (
     <Modal onClose={onClose} isOpen={isOpen}>
@@ -110,8 +109,13 @@ export default function LoginModal({ isOpen, onClose }: LoginModalProps) {
               />
             </InputGroup>
           </VStack>
+          {loginMutation.isError ? (
+            <Text color='red.500' textAlign={"center"} fontSize={"sm"}>
+              Username or Password are worng
+            </Text>
+          ) : null}
           <Button
-            isLoading={mutation.isLoading}
+            isLoading={loginMutation.isLoading}
             type='submit'
             mt={4}
             colorScheme={"red"}

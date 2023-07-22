@@ -11,11 +11,13 @@ export const getRooms = () =>
   instance.get("rooms/").then((response) => response.data);
 
 export const getRoom = ({ queryKey }: QueryFunctionContext) => {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [_, roomPk] = queryKey;
   return instance.get(`rooms/${roomPk}`).then((response) => response.data);
 };
 
 export const getRoomReviews = ({ queryKey }: QueryFunctionContext) => {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [_, roomPk] = queryKey;
   return instance
     .get(`rooms/${roomPk}/reviews`)
@@ -81,6 +83,42 @@ export const userDefualtLogin = ({
     .post(
       `users/log-in`,
       { username, password },
+      {
+        headers: {
+          "X-CSRFToken": Cookie.get("csrftoken") || "",
+        },
+      },
+    )
+    .then((response) => response.data);
+
+export interface IUserDefaultSignUpVariables {
+  name: string;
+  email: string;
+  username: string;
+  password: string;
+}
+
+export type signUpErrMsgType = {
+  [key: string]: string[];
+};
+export interface IUserDefaultSignUpError {
+  response: {
+    data: signUpErrMsgType;
+    status: number;
+    statusText: string;
+  };
+}
+
+export const userDefaultSignUp = ({
+  name,
+  email,
+  username,
+  password,
+}: IUserDefaultSignUpVariables) =>
+  instance
+    .post(
+      `users/sign-up`,
+      { name, email, username, password },
       {
         headers: {
           "X-CSRFToken": Cookie.get("csrftoken") || "",
