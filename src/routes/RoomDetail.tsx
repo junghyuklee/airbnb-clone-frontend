@@ -21,9 +21,10 @@ import { FaStar } from "react-icons/fa";
 export default function RoomDetail() {
   const { roomPk } = useParams();
   const { isLoading, data } = useQuery<IRoomDetail>([`rooms`, roomPk], getRoom);
-  const { isLoading: isReviewsLoading, data: reviewsData } = useQuery<
-    IReview[]
-  >([`rooms`, roomPk, `reviews`], getRoomReviews);
+  const { data: reviewsData } = useQuery<IReview[]>(
+    [`rooms`, roomPk, `reviews`],
+    getRoomReviews,
+  );
   const gray = useColorModeValue("gray.600", "gray.500");
   return (
     <Box
