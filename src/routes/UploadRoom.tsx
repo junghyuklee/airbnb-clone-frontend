@@ -1,11 +1,12 @@
 import ProtectedPage from "../components/ProtectedPage";
-import UseHostOnlyPage from "../components/UseHostOnlyPage";
+import HostOnlyPage from "../components/HostOnlyPage";
 
 export default function UploadRoom() {
-  UseHostOnlyPage();
   return (
     <ProtectedPage>
-      <h1>uploadRoom</h1>
+      <HostOnlyPage>
+        <h1>uploadRoom</h1>
+      </HostOnlyPage>
     </ProtectedPage>
   );
 }

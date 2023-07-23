@@ -1,8 +1,11 @@
-import { useEffect } from "react";
+import React, { useEffect } from "react";
 import useUser from "../lib/useUser";
 import { useNavigate } from "react-router-dom";
 
-export default function UseHostOnlyPage() {
+interface IHostOnlyPageProps {
+  children: React.ReactNode;
+}
+export default function HostOnlyPage({ children }: IHostOnlyPageProps) {
   const { user, userLoading } = useUser();
   const navigate = useNavigate();
   useEffect(() => {
@@ -12,5 +15,5 @@ export default function UseHostOnlyPage() {
       }
     }
   }, [user, userLoading, navigate]);
-  return;
+  return <>{children}</>;
 }
