@@ -1,5 +1,8 @@
 import { useQuery } from "@tanstack/react-query";
 import { useParams } from "react-router-dom";
+import Calendar from "react-calendar";
+import "react-calendar/dist/Calendar.css";
+import { Value as CalendarValType } from "react-calendar/dist/cjs/shared/types";
 import { getRoom, getRoomReviews } from "../api";
 import { IReview, IRoomDetail } from "../types";
 import {
@@ -17,6 +20,7 @@ import {
   useColorModeValue,
 } from "@chakra-ui/react";
 import { FaStar } from "react-icons/fa";
+import { useState } from "react";
 
 export default function RoomDetail() {
   const { roomPk } = useParams();
@@ -25,6 +29,8 @@ export default function RoomDetail() {
     [`rooms`, roomPk, `reviews`],
     getRoomReviews,
   );
+  const [dates, setDates] = useState<CalendarValType>();
+  console.log(dates);
   const gray = useColorModeValue("gray.600", "gray.500");
   return (
     <Box
@@ -63,71 +69,93 @@ export default function RoomDetail() {
             key={index}
           >
             <Skeleton isLoaded={!isLoading} h={"100%"} w={"100%"}>
-              <Image
-                objectFit={"cover"}
-                w={"100%"}
-                h={"100%"}
-                src={data?.photos[index]?.file}
-              />
+              {data?.photos && data.photos.length > 0 ? (
+                <Image
+                  objectFit={"cover"}
+                  w={"100%"}
+                  h={"100%"}
+                  src={data?.photos[index]?.file}
+                />
+              ) : null}
             </Skeleton>
           </GridItem>
         ))}
       </Grid>
-      <HStack w={"40%"} justifyContent={"space-between"} mt={10}>
-        <VStack alignItems={"flex-start"}>
-          <Skeleton isLoaded={!isLoading} h={"30px"}>
-            <Heading fontSize={"2xl"}>
-              House hosted by {data?.owner.name}
-            </Heading>
-          </Skeleton>
-          <Skeleton isLoaded={!isLoading} h={"30px"}>
-            <HStack justifyContent={"flex-start"} w={"100%"}>
-              <Text>
-                {data?.toilets} toilet{data?.toilets === 1 ? "" : "s"}
-              </Text>
-              <Text>·</Text>
-              <Text>
-                {data?.rooms} room{data?.rooms === 1 ? "" : "s"}
-              </Text>
-            </HStack>
-          </Skeleton>
-        </VStack>
-        <Avatar name={data?.owner.name} size={"xl"} src={data?.owner.avatar} />
-      </HStack>
-      <Box mt={10}>
-        <Heading mb={5} fontSize={"2xl"}>
-          <HStack>
-            <FaStar /> <Text>{data?.rating}</Text>
-            <Text>·</Text>
-            <Text>
-              {reviewsData?.length} review{reviewsData?.length === 1 ? "" : "s"}
-            </Text>
-          </HStack>
-        </Heading>
-        <Container mt={16} marginX={"none"} maxW={"container.lg"}>
-          <Grid gap={10} templateColumns={"1fr 1fr"}>
-            {reviewsData?.map((review, index) => (
-              <VStack alignItems={"flex-start"} key={index}>
-                <HStack>
-                  <Avatar
-                    name={review.user.name}
-                    src={review.user.avatar}
-                    size={"md"}
-                  />
-                  <VStack spacing={0} alignItems={"flex-start"}>
-                    <Heading fontSize={"md"}>{review.user.name}</Heading>
-                    <HStack spacing={1}>
-                      <FaStar size={"12px"} />
-                      <Text>{review.rating}</Text>
-                    </HStack>
-                  </VStack>
+      <Grid gap={60} templateColumns={"2fr 1fr"}>
+        <Box>
+          <HStack w={"40%"} justifyContent={"space-between"} mt={10}>
+            <VStack alignItems={"flex-start"}>
+              <Skeleton isLoaded={!isLoading} h={"30px"}>
+                <Heading fontSize={"2xl"}>
+                  House hosted by {data?.owner.name}
+                </Heading>
+              </Skeleton>
+              <Skeleton isLoaded={!isLoading} h={"30px"}>
+                <HStack justifyContent={"flex-start"} w={"100%"}>
+                  <Text>
+                    {data?.toilets} toilet{data?.toilets === 1 ? "" : "s"}
+                  </Text>
+                  <Text>·</Text>
+                  <Text>
+                    {data?.rooms} room{data?.rooms === 1 ? "" : "s"}
+                  </Text>
                 </HStack>
-                <Text>{review.payload}</Text>
-              </VStack>
-            ))}
-          </Grid>
-        </Container>
-      </Box>
+              </Skeleton>
+            </VStack>
+            <Avatar
+              name={data?.owner.name}
+              size={"xl"}
+              src={data?.owner.avatar}
+            />
+          </HStack>
+          <Box mt={10}>
+            <Heading mb={5} fontSize={"2xl"}>
+              <HStack>
+                <FaStar /> <Text>{data?.rating}</Text>
+                <Text>·</Text>
+                <Text>
+                  {reviewsData?.length} review
+                  {reviewsData?.length === 1 ? "" : "s"}
+                </Text>
+              </HStack>
+            </Heading>
+            <Container mt={16} marginX={"none"} maxW={"container.lg"}>
+              <Grid gap={10} templateColumns={"1fr 1fr"}>
+                {reviewsData?.map((review, index) => (
+                  <VStack alignItems={"flex-start"} key={index}>
+                    <HStack>
+                      <Avatar
+                        name={review.user.name}
+                        src={review.user.avatar}
+                        size={"md"}
+                      />
+                      <VStack spacing={0} alignItems={"flex-start"}>
+                        <Heading fontSize={"md"}>{review.user.name}</Heading>
+                        <HStack spacing={1}>
+                          <FaStar size={"12px"} />
+                          <Text>{review.rating}</Text>
+                        </HStack>
+                      </VStack>
+                    </HStack>
+                    <Text>{review.payload}</Text>
+                  </VStack>
+                ))}
+              </Grid>
+            </Container>
+          </Box>
+        </Box>
+        <Box pt={10}>
+          <Calendar
+            onChange={setDates}
+            prev2Label={null}
+            next2Label={null}
+            minDate={new Date()}
+            maxDate={new Date(Date.now() + 60 * 60 * 24 * 7 * 3 * 6 * 1000)}
+            minDetail='month'
+            selectRange
+          />
+        </Box>
+      </Grid>
     </Box>
   );
 }
