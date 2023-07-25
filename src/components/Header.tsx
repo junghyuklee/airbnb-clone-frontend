@@ -115,6 +115,9 @@ export default function Header() {
                     <MenuItem>Upload Room</MenuItem>
                   </Link>
                 ) : null}
+                <Link to='/mybooking'>
+                  <MenuItem>My Bookings</MenuItem>
+                </Link>
                 <MenuItem onClick={onLogOut}>Log Out</MenuItem>
               </MenuList>
             </Menu>

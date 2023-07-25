@@ -8,6 +8,7 @@ import KakaoConfirm from "./routes/KakaoConfirm";
 import UploadRoom from "./routes/UploadRoom";
 import UploadPhotos from "./routes/UploadPhotos";
 import RoomEdit from "./routes/RoomEdit";
+import MyBooking from "./routes/MyBooking";
 
 const router = createBrowserRouter([
   {
@@ -18,6 +19,10 @@ const router = createBrowserRouter([
       {
         path: "",
         element: <Home />,
+      },
+      {
+        path: "mybooking",
+        element: <MyBooking />,
       },
       {
         path: "rooms/upload",

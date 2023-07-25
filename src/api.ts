@@ -283,3 +283,6 @@ export const roomBooking = (variables: IRoomBookingVariables) =>
       },
     })
     .then((response) => response.data);
+
+export const getUserBookings = () =>
+  instance.get("users/bookings").then((response) => response.data);

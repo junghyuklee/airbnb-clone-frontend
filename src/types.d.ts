@@ -22,6 +22,14 @@ export interface IRoomList {
   photos: IRoomPhoto[];
 }
 
+export interface IUserBookingList {
+  pk: number;
+  room: IRoomList;
+  check_in: string;
+  check_out: string;
+  guests: number;
+}
+
 export interface IRoomOwner {
   name: string;
   avatar: string;
