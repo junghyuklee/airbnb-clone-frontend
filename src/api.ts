@@ -1,6 +1,7 @@
 import Cookie from "js-cookie";
 import { QueryFunctionContext } from "@tanstack/react-query";
 import axios from "axios";
+import { formatDate } from "./lib/utils";
 
 const instance = axios.create({
   baseURL: "http://127.0.0.1:8000/api/v1/",
@@ -157,6 +158,31 @@ export const uploadRoom = (variables: IUploadRoomVariables) =>
     })
     .then((response) => response.data);
 
+export interface IUpdateRoomVariables {
+  roomPk: string;
+  name: string;
+  country: string;
+  city: string;
+  price: number;
+  rooms: number;
+  toilets: number;
+  description: string;
+  address: string;
+  pet_friendly: boolean;
+  kind: string;
+  amenities: number[];
+  category: number;
+}
+
+export const updateRoom = (variables: IUpdateRoomVariables) =>
+  instance
+    .put(`rooms/${variables.roomPk}`, variables, {
+      headers: {
+        "X-CSRFToken": Cookie.get("csrftoken") || "",
+      },
+    })
+    .then((response) => response.data);
+
 export const getUploadImgUrl = () =>
   instance
     .post(`medias/photos/get-url`, null, {
@@ -205,3 +231,22 @@ export const registPhoto = ({
       },
     )
     .then((response) => response.data);
+
+type CheckBookingQueryKey = [string, string?, Date[]?];
+
+export const checkBooking = ({
+  queryKey,
+}: QueryFunctionContext<CheckBookingQueryKey>) => {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [_, roomPk, dates] = queryKey;
+  if (dates) {
+    const [firstDate, secondDate] = dates;
+    const checkIn = formatDate(firstDate);
+    const checkOut = formatDate(secondDate);
+    return instance
+      .get(
+        `rooms/${roomPk}/bookings/check?check_in=${checkIn}&check_out=${checkOut}`,
+      )
+      .then((response) => response.data);
+  }
+};

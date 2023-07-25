@@ -1,13 +1,13 @@
 import { useQuery } from "@tanstack/react-query";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import Calendar from "react-calendar";
 import "react-calendar/dist/Calendar.css";
-import { Value as CalendarValType } from "react-calendar/dist/cjs/shared/types";
-import { getRoom, getRoomReviews } from "../api";
+import { checkBooking, getRoom, getRoomReviews } from "../api";
 import { IReview, IRoomDetail } from "../types";
 import {
   Avatar,
   Box,
+  Button,
   Container,
   Grid,
   GridItem,
@@ -19,29 +19,51 @@ import {
   VStack,
   useColorModeValue,
 } from "@chakra-ui/react";
-import { FaStar } from "react-icons/fa";
+import { FaEdit, FaStar } from "react-icons/fa";
 import { useState } from "react";
+import { Helmet } from "react-helmet";
 
 export default function RoomDetail() {
+  const gray = useColorModeValue("gray.600", "gray.500");
   const { roomPk } = useParams();
   const { isLoading, data } = useQuery<IRoomDetail>([`rooms`, roomPk], getRoom);
   const { data: reviewsData } = useQuery<IReview[]>(
     [`rooms`, roomPk, `reviews`],
     getRoomReviews,
   );
-  const [dates, setDates] = useState<CalendarValType>();
-  console.log(dates);
-  const gray = useColorModeValue("gray.600", "gray.500");
+  const [dates, setDates] = useState<any>();
+  const { data: checkBookingData, isLoading: isCheckingBooking } = useQuery(
+    ["check", roomPk, dates],
+    checkBooking,
+    {
+      cacheTime: 0,
+      enabled: dates !== undefined,
+    },
+  );
+  const navigate = useNavigate();
+  const onEditClick = (event: React.SyntheticEvent<HTMLButtonElement>) => {
+    event.preventDefault(); // click이 링크로 전파되는것을 방지(버블링 방지)한다.
+    navigate(`/rooms/${data?.id}/edit`);
+  };
   return (
     <Box
+      pb={40}
       mt={10}
       px={{
         base: 10,
         lg: 20,
       }}
     >
+      <Helmet>
+        <title>{data ? data.name : "Loading..."}</title>
+      </Helmet>
       <Skeleton height={"43px"} width={"25%"} isLoaded={!isLoading} mb={2}>
-        <Heading>{data?.name}</Heading>
+        <HStack>
+          <Heading>{data?.name}</Heading>
+          <Button variant={"unstyled"} onClick={onEditClick}>
+            {data?.is_owner ? <FaEdit size={25} /> : null}
+          </Button>
+        </HStack>
       </Skeleton>
       <Skeleton height={"21px"} width={"20%"} isLoaded={!isLoading}>
         <HStack spacing={1} alignItems={"center"}>
@@ -154,6 +176,18 @@ export default function RoomDetail() {
             minDetail='month'
             selectRange
           />
+          <Button
+            disabled={!checkBookingData?.ok}
+            isLoading={isCheckingBooking && dates !== undefined}
+            my={5}
+            w={"70%"}
+            colorScheme={"red"}
+          >
+            Make Booking
+          </Button>
+          {!isCheckingBooking && !checkBookingData?.ok ? (
+            <Text color='red.500'>Can't book on those dates, sorry.</Text>
+          ) : null}
         </Box>
       </Grid>
     </Box>
