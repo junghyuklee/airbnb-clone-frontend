@@ -30,6 +30,14 @@ export interface IUserBookingList {
   guests: number;
 }
 
+export interface IRoomBookingList {
+  pk: number;
+  user: IRoomOwner;
+  check_in: string;
+  check_out: string;
+  guests: number;
+}
+
 export interface IRoomOwner {
   name: string;
   avatar: string;

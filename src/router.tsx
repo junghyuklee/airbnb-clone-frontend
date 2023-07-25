@@ -9,6 +9,7 @@ import UploadRoom from "./routes/UploadRoom";
 import UploadPhotos from "./routes/UploadPhotos";
 import RoomEdit from "./routes/RoomEdit";
 import MyBooking from "./routes/MyBooking";
+import RoomBookings from "./routes/RoomBookings";
 
 const router = createBrowserRouter([
   {
@@ -33,12 +34,16 @@ const router = createBrowserRouter([
         element: <RoomDetail />,
       },
       {
-        path: "rooms/:roomPk/photos",
-        element: <UploadPhotos />,
+        path: "rooms/:roomPk/bookings",
+        element: <RoomBookings />,
       },
       {
         path: "rooms/:roomPk/edit",
         element: <RoomEdit />,
+      },
+      {
+        path: "rooms/:roomPk/photos",
+        element: <UploadPhotos />,
       },
       {
         path: "social",

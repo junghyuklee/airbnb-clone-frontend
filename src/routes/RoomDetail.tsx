@@ -31,7 +31,7 @@ import {
   useColorModeValue,
   useToast,
 } from "@chakra-ui/react";
-import { FaEdit, FaStar, FaUserFriends } from "react-icons/fa";
+import { FaBookOpen, FaEdit, FaStar, FaUserFriends } from "react-icons/fa";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { Helmet } from "react-helmet";
@@ -59,6 +59,12 @@ export default function RoomDetail() {
   const onEditClick = (event: React.SyntheticEvent<HTMLButtonElement>) => {
     event.preventDefault(); // click이 링크로 전파되는것을 방지(버블링 방지)한다.
     navigate(`/rooms/${data?.id}/edit`);
+  };
+  const onBookingUsersClick = (
+    event: React.SyntheticEvent<HTMLButtonElement>,
+  ) => {
+    event.preventDefault(); // click이 링크로 전파되는것을 방지(버블링 방지)한다.
+    navigate(`/rooms/${data?.id}/bookings`);
   };
   const toast = useToast();
   const roomBookingMutation = useMutation<
@@ -103,6 +109,9 @@ export default function RoomDetail() {
           <Heading>{data?.name}</Heading>
           <Button variant={"unstyled"} onClick={onEditClick}>
             {data?.is_owner ? <FaEdit size={25} /> : null}
+          </Button>
+          <Button variant={"unstyled"} onClick={onBookingUsersClick}>
+            {data?.is_owner ? <FaBookOpen size={25} /> : null}
           </Button>
         </HStack>
       </Skeleton>

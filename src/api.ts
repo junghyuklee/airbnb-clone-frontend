@@ -286,3 +286,11 @@ export const roomBooking = (variables: IRoomBookingVariables) =>
 
 export const getUserBookings = () =>
   instance.get("users/bookings").then((response) => response.data);
+
+export const getRoomBookings = ({ queryKey }: QueryFunctionContext) => {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [_, roomPk] = queryKey;
+  return instance
+    .get(`rooms/${roomPk}/bookings`)
+    .then((response) => response.data);
+};
