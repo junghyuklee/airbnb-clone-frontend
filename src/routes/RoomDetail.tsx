@@ -1,8 +1,16 @@
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { useNavigate, useParams } from "react-router-dom";
 import Calendar from "react-calendar";
 import "react-calendar/dist/Calendar.css";
-import { checkBooking, getRoom, getRoomReviews } from "../api";
+import {
+  IRoomBookingError,
+  IRoomBookingSuccess,
+  IRoomBookingVariables,
+  checkBooking,
+  getRoom,
+  getRoomReviews,
+  roomBooking,
+} from "../api";
 import { IReview, IRoomDetail } from "../types";
 import {
   Avatar,
@@ -14,16 +22,23 @@ import {
   HStack,
   Heading,
   Image,
+  InputGroup,
+  InputLeftAddon,
+  Select,
   Skeleton,
   Text,
   VStack,
   useColorModeValue,
+  useToast,
 } from "@chakra-ui/react";
-import { FaEdit, FaStar } from "react-icons/fa";
+import { FaEdit, FaStar, FaUserFriends } from "react-icons/fa";
 import { useState } from "react";
+import { useForm } from "react-hook-form";
 import { Helmet } from "react-helmet";
+import { formatDate } from "../lib/utils";
 
 export default function RoomDetail() {
+  const { register, handleSubmit } = useForm<IRoomBookingVariables>();
   const gray = useColorModeValue("gray.600", "gray.500");
   const { roomPk } = useParams();
   const { isLoading, data } = useQuery<IRoomDetail>([`rooms`, roomPk], getRoom);
@@ -44,6 +59,32 @@ export default function RoomDetail() {
   const onEditClick = (event: React.SyntheticEvent<HTMLButtonElement>) => {
     event.preventDefault(); // click이 링크로 전파되는것을 방지(버블링 방지)한다.
     navigate(`/rooms/${data?.id}/edit`);
+  };
+  const toast = useToast();
+  const roomBookingMutation = useMutation<
+    IRoomBookingSuccess,
+    IRoomBookingError,
+    IRoomBookingVariables
+  >(roomBooking, {
+    onSuccess: (data) => {
+      toast({
+        title: "Booking complete!",
+        description: `From: ${data.check_in} To: ${data.check_out} Booking Completed`,
+        status: "success",
+        position: "bottom-right",
+      });
+    },
+  });
+  const doBooking = (data: IRoomBookingVariables) => {
+    if (dates && roomPk) {
+      const [firstDate, secondDate] = dates;
+      const checkIn = formatDate(firstDate);
+      const checkOut = formatDate(secondDate);
+      data.check_in = checkIn;
+      data.check_out = checkOut;
+      data.roomPk = roomPk;
+      roomBookingMutation.mutate(data);
+    }
   };
   return (
     <Box
@@ -176,18 +217,41 @@ export default function RoomDetail() {
             minDetail='month'
             selectRange
           />
-          <Button
-            disabled={!checkBookingData?.ok}
-            isLoading={isCheckingBooking && dates !== undefined}
-            my={5}
-            w={"70%"}
-            colorScheme={"red"}
+          <Grid
+            templateColumns={"1fr"}
+            as={"form"}
+            onSubmit={handleSubmit(doBooking)}
           >
-            Make Booking
-          </Button>
-          {!isCheckingBooking && !checkBookingData?.ok ? (
-            <Text color='red.500'>Can't book on those dates, sorry.</Text>
-          ) : null}
+            <HStack mt={5} mb={2}>
+              <Text>Guests</Text>
+              <InputGroup>
+                <InputLeftAddon children={<FaUserFriends />} />
+                <Select
+                  {...register("guests", { required: true })}
+                  defaultValue={1}
+                  w={"55%"}
+                >
+                  {[1, 2, 3, 4, 5].map((guest) => (
+                    <option key={guest} value={guest}>
+                      {guest}
+                    </option>
+                  ))}
+                </Select>
+              </InputGroup>
+            </HStack>
+            <Button
+              type={"submit"}
+              isDisabled={!checkBookingData?.ok}
+              isLoading={isCheckingBooking && dates !== undefined}
+              w={"70%"}
+              colorScheme={"red"}
+            >
+              Make Booking
+            </Button>
+            {!isCheckingBooking && !checkBookingData?.ok ? (
+              <Text color='red.500'>Can't book on those dates, sorry.</Text>
+            ) : null}
+          </Grid>
         </Box>
       </Grid>
     </Box>

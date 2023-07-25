@@ -250,3 +250,36 @@ export const checkBooking = ({
       .then((response) => response.data);
   }
 };
+
+export interface IRoomBookingVariables {
+  check_in: string;
+  check_out: string;
+  roomPk: string;
+  guests: number;
+}
+
+export interface IRoomBookingSuccess {
+  check_in: string;
+  check_out: string;
+}
+
+export type roomBookingErrMsgType = {
+  [key: string]: string[];
+};
+
+export interface IRoomBookingError {
+  response: {
+    data: roomBookingErrMsgType;
+    status: number;
+    statusText: string;
+  };
+}
+
+export const roomBooking = (variables: IRoomBookingVariables) =>
+  instance
+    .post(`rooms/${variables.roomPk}/bookings`, variables, {
+      headers: {
+        "X-CSRFToken": Cookie.get("csrftoken") || "",
+      },
+    })
+    .then((response) => response.data);
